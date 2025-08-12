@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:HaoZeke/eOn
+	branch = doCIdimer
+	commit = eb63d4a2550e773e80738e74080cee627323107a
+	parent = a25d5771de0495699c99b9e34e1cdbe623fd26f8
+	method = merge
+	cmdver = 0.4.9
