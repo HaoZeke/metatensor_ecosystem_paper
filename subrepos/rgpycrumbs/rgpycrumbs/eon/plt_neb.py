@@ -320,7 +320,7 @@ def setup_plot_aesthetics(ax, title, xlabel, ylabel, facecolor="gray"):
 @click.option(
     "--figsize",
     nargs=2,
-    type=float,
+    type=(float, float),
     default=(10, 7),
     show_default=True,
     help="Figure width, height in inches.",
