@@ -309,6 +309,28 @@ def setup_plot_aesthetics(ax, title, xlabel, ylabel, facecolor="gray"):
     default=True,
     help="Highlight the final path in red.",
 )
+@click.option(
+    "--figsize",
+    nargs=2,
+    type=float,
+    default=(10, 7),
+    show_default=True,
+    help="Figure width, height in inches.",
+)
+@click.option(
+    "--dpi",
+    type=int,
+    default=200,
+    show_default=True,
+    help="Resolution in Dots Per Inch.",
+)
+@click.option(
+    "--fontsize-base",
+    type=int,
+    default=12,
+    show_default=True,
+    help="Base font size for text.",
+)
 def main(
     input_pattern: str,
     con_file: Path | None,
@@ -317,6 +339,7 @@ def main(
     output_file: Path | None,
     start: int | None,
     end: int | None,
+    *,
     normalize_rc: bool,
     title: str,
     xlabel: str,
@@ -324,6 +347,9 @@ def main(
     cmap: str,
     highlight_last: bool,
     facecolor: str,
+    figsize: tuple,
+    dpi: int,
+    fontsize_base: int,
 ):
     """
     Plots a series of NEB paths from .dat files.
@@ -333,7 +359,8 @@ def main(
         sys.exit(1)
 
     plt.style.use("bmh")
-    fig, ax = plt.subplots(figsize=(10, 7), dpi=200)
+    plt.rcParams.update({"font.size": fontsize_base})
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
     atoms_list = None
     if con_file:
