@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:HaoZeke/rgpycrumbs
+	branch = main
+	commit = 98860daa0baff0b3072ba89fe46eca6a322b8af0
+	parent = 9f0672202f67c95144624beb2fc1ae1da2b8d9a3
+	method = merge
+	cmdver = 0.4.9
