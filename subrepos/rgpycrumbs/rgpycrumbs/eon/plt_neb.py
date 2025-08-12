@@ -66,7 +66,13 @@ def load_paths(file_pattern: str) -> list[Path]:
 
 
 def plot_structure_insets(
-    ax, atoms_list, rc_points, y_points, images_to_plot="all", plot_mode="energy"
+    ax,
+    atoms_list,
+    rc_points,
+    y_points,
+    images_to_plot="all",
+    plot_mode="energy",
+    zoom_ratio=0.4,
 ):
     """
     Renders and plots selected atomic structures as insets on the provided matplotlib axis.
@@ -89,6 +95,8 @@ def plot_structure_insets(
         Determines how the saddle point is selected. Options:
             - "energy": saddle is the structure with maximum y value.
             - "eigenvalue": saddle is the structure with minimum y value.
+    zoom_ratio : float, optional
+        Determines the size of inset
 
     Behavior
     --------
@@ -137,7 +145,7 @@ def plot_structure_insets(
         img_data = plt.imread(buf)
         buf.close()
 
-        imagebox = OffsetImage(img_data, zoom=0.4)
+        imagebox = OffsetImage(img_data, zoom=zoom_ratio)
         if images_to_plot == "all":
             y_offset, rad = (60.0, 0.1) if i % 2 == 0 else (-60.0, -0.1)
             xybox = (15.0, y_offset)
@@ -156,7 +164,7 @@ def plot_structure_insets(
             pad=0.1,
             arrowprops=dict(
                 arrowstyle=ArrowStyle.Fancy(
-                    head_length=0.4, head_width=0.4, tail_width=0.1
+                    head_length=zoom_ratio, head_width=zoom_ratio, tail_width=0.1
                 ),
                 connectionstyle=connectionstyle,
                 linestyle="--",
@@ -325,6 +333,13 @@ def setup_plot_aesthetics(ax, title, xlabel, ylabel, facecolor="gray"):
     help="Resolution in Dots Per Inch.",
 )
 @click.option(
+    "--zoom-ratio",
+    type=float,
+    default=0.4,
+    show_default=True,
+    help="Scale the inset image",
+)
+@click.option(
     "--fontsize-base",
     type=int,
     default=12,
@@ -341,6 +356,7 @@ def main(
     end: int | None,
     *,
     normalize_rc: bool,
+    zoom_ratio: float,
     title: str,
     xlabel: str,
     ylabel: str,
@@ -425,6 +441,7 @@ def main(
                     path_data[y_data_column],
                     plot_structures,
                     plot_mode,
+                    zoom_ratio,
                 )
         else:
             color = colormap(idx / color_divisor)
