@@ -253,9 +253,10 @@ def setup_plot_aesthetics(ax, title, xlabel, ylabel, facecolor="gray"):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.minorticks_on()
+    ax.minorticks_off()
     ax.set_facecolor(facecolor)
     ax.set_xlim(left=0)
+    plt.grid(False)
     plt.tight_layout(pad=0.5)
 
 
@@ -374,8 +375,9 @@ def main(
         log.error("--plot-structures requires a --con-file to be provided.")
         sys.exit(1)
 
-    plt.style.use("bmh")
+    # plt.style.use("bmh")
     plt.rcParams.update({"font.size": fontsize_base})
+    plt.rcParams.update({"font.family": "serif"})
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
     atoms_list = None
