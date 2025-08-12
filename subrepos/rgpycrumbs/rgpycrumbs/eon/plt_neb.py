@@ -18,6 +18,7 @@
 import glob
 import logging
 from pathlib import Path
+from collections import namedtuple
 import sys
 import io
 
@@ -53,6 +54,9 @@ log = logging.getLogger("rich")
 DEFAULT_INPUT_PATTERN = "neb_*.dat"
 DEFAULT_CMAP = "batlow"
 
+# Datastructures
+InsetImagePos = namedtuple("InsetImagePos", "x y rad")
+
 
 def load_paths(file_pattern: str) -> list[Path]:
     """Finds and sorts files matching a glob pattern."""
@@ -73,6 +77,9 @@ def plot_structure_insets(
     images_to_plot="all",
     plot_mode="energy",
     zoom_ratio=0.4,
+    draw_reactant=InsetImagePos(15, 60, 0.1),
+    draw_saddle=InsetImagePos(15, 60, 0.1),
+    draw_product=InsetImagePos(15, 60, 0.1),
 ):
     """
     Renders and plots selected atomic structures as insets on the provided matplotlib axis.
@@ -128,7 +135,7 @@ def plot_structure_insets(
             saddle_index = np.argmin(y_points)  # Lowest point for eigenvalue
 
         crit_indices = {0, saddle_index, len(atoms_list) - 1}
-        plot_indices = sorted(list(crit_indices))
+        plot_indices = sorted(crit_indices)
 
     for i in plot_indices:
         atoms = atoms_list[i]
@@ -151,8 +158,17 @@ def plot_structure_insets(
             xybox = (15.0, y_offset)
             connectionstyle = f"arc3,rad={rad}"
         else:
-            xybox = (15.0, 60.0)
-            connectionstyle = "arc3,rad=0.1"
+            # TODO(rg): Cleanup
+            if i == 0:
+                xybox = (draw_reactant.x, draw_reactant.y)
+                rad = draw_reactant.rad
+            elif i == saddle_index:
+                xybox = (draw_saddle.x, draw_saddle.y)
+                rad = draw_saddle.rad
+            else:
+                xybox = (draw_product.x, draw_product.y)
+                rad = draw_product.rad
+            connectionstyle = f"arc3,rad={rad}"
 
         ab = AnnotationBbox(
             imagebox,
@@ -347,6 +363,30 @@ def setup_plot_aesthetics(ax, title, xlabel, ylabel, facecolor="gray"):
     show_default=True,
     help="Base font size for text.",
 )
+@click.option(
+    "--draw-reactant",
+    type=(float, float, float),
+    nargs=3,
+    default=(15, 60, 0.1),
+    show_default=True,
+    help="Positioning for the reactant inset (x, y, rad).",
+)
+@click.option(
+    "--draw-saddle",
+    type=(float, float, float),
+    nargs=3,
+    default=(15, 60, 0.1),
+    show_default=True,
+    help="Positioning for the saddle inset (x, y, rad).",
+)
+@click.option(
+    "--draw-product",
+    type=(float, float, float),
+    nargs=3,
+    default=(15, 60, 0.1),
+    show_default=True,
+    help="Positioning for the product inset (x, y, rad).",
+)
 def main(
     input_pattern: str,
     con_file: Path | None,
@@ -367,6 +407,10 @@ def main(
     figsize: tuple,
     dpi: int,
     fontsize_base: int,
+    # XXX(rg): These can probably be validated better
+    draw_reactant: tuple,
+    draw_saddle: tuple,
+    draw_product: tuple,
 ):
     """
     Plots a series of NEB paths from .dat files.
@@ -444,6 +488,15 @@ def main(
                     plot_structures,
                     plot_mode,
                     zoom_ratio,
+                    draw_reactant=InsetImagePos(
+                        x=draw_reactant[0], y=draw_reactant[1], rad=draw_reactant[2]
+                    ),
+                    draw_saddle=InsetImagePos(
+                        x=draw_saddle[0], y=draw_saddle[1], rad=draw_saddle[2]
+                    ),
+                    draw_product=InsetImagePos(
+                        x=draw_product[0], y=draw_product[1], rad=draw_product[2]
+                    ),
                 )
         else:
             color = colormap(idx / color_divisor)
